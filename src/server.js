@@ -170,12 +170,12 @@ userRoutes.post("/update", function(req, res) {
 
 userRoutes.get("/delete", function(req, res) {
     User.findByIdAndRemove(req.body.id, function(err, user) {
-      if (err) {
-          res.json({
-              success: false,
-              reason: err.message
-          });
-      }
+        if (err) {
+            res.json({
+                success: false,
+                reason: err.message
+            });
+        }
         res.json({
             success: true
         })
@@ -215,121 +215,127 @@ studentRoutes.get("/read", function(req, res) {
             success: true,
             students: result
         });
-    }else {
-      Student.find({}, function(err, students){
+    } else {
+        Student.find({}, function(err, students) {
+            if (err) {
+                res.json({
+                    success: false,
+                    reason: err.message
+                });
+            }
+            res.json({
+                success: true,
+                students: students
+            });
+        });
+    }
+});
+
+studentRoutes.post("/update", function(req, res) {
+    Student.findByIdAndUpdate(req.body.id, req.body.student, function(err, student) {
         if (err) {
             res.json({
                 success: false,
                 reason: err.message
             });
         }
-        res.json({success: true, students: students});
-      });
-    }
-});
-
-studentRoutes.post("/update", function(req, res) {
-  Student.findByIdAndUpdate(req.body.id, req.body.student, function(err, student){
-    if (err) {
         res.json({
-            success: false,
-            reason: err.message
-        });
-    }
-    res.json({
-      success: true,
-      student: student
-    })
-  });
+            success: true,
+            student: student
+        })
+    });
 });
 
 studentRoutes.get("/update-location", function(req, res) {
-  results = [];
-  req.body.ids.forEach(function(id) {
-      Student.findByIdAndUpdate(id, {location: req.body.location, timelastout: new Date()} ,function(err, student) {
-          if (err) {
-              res.json({
-                  success: false,
-                  reason: err.message
-              });
-          }
-          results.push(student);
-      });
-  });
-  res.json({
-      success: true,
-      students: results
-  });
+    results = [];
+    req.body.ids.forEach(function(id) {
+        Student.findByIdAndUpdate(id, {
+            location: req.body.location,
+            timelastout: new Date()
+        }, function(err, student) {
+            if (err) {
+                res.json({
+                    success: false,
+                    reason: err.message
+                });
+            }
+            results.push(student);
+        });
+    });
+    res.json({
+        success: true,
+        students: results
+    });
 });
 
 studentRoutes.get("/delete", function(req, res) {
-  Student.findByIdAndRemove(req.body.id, function(err, user) {
-    if (err) {
+    Student.findByIdAndRemove(req.body.id, function(err, user) {
+        if (err) {
+            res.json({
+                success: false,
+                reason: err.message
+            });
+        }
         res.json({
-            success: false,
-            reason: err.message
-        });
-    }
-      res.json({
-          success: true
-      })
-  });
+            success: true
+        })
+    });
 });
 
 locationRoutes.post("/create", function(req, res) {
-  var newLocation = new Location(req.body);
-  newLocation.save(function(err){
-    if (err) {
+    var newLocation = new Location(req.body);
+    newLocation.save(function(err) {
+        if (err) {
+            res.json({
+                success: false,
+                reason: err.message
+            });
+        }
         res.json({
-            success: false,
-            reason: err.message
+            success: true
         });
-    }
-    res.json({
-      success: true
-    });
-  })
+    })
 });
 locationRoutes.get("/read", function(req, res) {
-  Location.find({}, function(err, locations){
-    if (err) {
+    Location.find({}, function(err, locations) {
+        if (err) {
+            res.json({
+                success: false,
+                reason: err.message
+            });
+        }
         res.json({
-            success: false,
-            reason: err.message
+            success: true,
+            locations: locations
         });
-    }
-    res.json({
-      success: true,
-      locations: locations
     });
-  });
 });
 locationRoutes.post("/update", function(req, res) {
-  Location.findByIdAndUpdate(req.body.id, req.body.location,function(err, location){
-    if (err) {
+    Location.findByIdAndUpdate(req.body.id, req.body.location, function(err, location) {
+        if (err) {
+            res.json({
+                success: false,
+                reason: err.message
+            });
+        }
         res.json({
-            success: false,
-            reason: err.message
+            success: true,
+            location: location
         });
-    }
-    res.json({
-      success: true,
-      location: location
     });
-  });
 });
 locationRoutes.get("/delete", function(req, res) {
-  Location.findByIdAndRemove(req.body.id, function(err){
-    if (err) {
+    Location.findByIdAndRemove(req.body.id, function(err) {
+        if (err) {
+            res.json({
+                success: false,
+                reason: err.message
+            });
+        }
         res.json({
-            success: false,
-            reason: err.message
+            success: true
         });
-    }
-    res.json({
-      success: true
     });
-  });
 });
 
 
