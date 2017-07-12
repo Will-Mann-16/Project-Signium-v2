@@ -2,7 +2,7 @@ export default function reducer(state={
   user: {},
   fetching: false,
   fetched: false,
-  authenticated: localStorage.getItem("jwt_token") ? true : false,
+  authenticated: localStorage.getItem("AUTH-TOKEN") ? true : false,
   error: null
 }, action){
 

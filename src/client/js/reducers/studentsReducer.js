@@ -6,14 +6,28 @@ export default function reducer(state={
 }, action){
 
   switch(action.type){
-    case "FETCH_ALL_STUDENTS":{
+    case "FETCH_STUDENTS_MAJOR":{
       return {...state, fetching: true, fetched: false};
     }
-    case "FETCH_ALL_STUDENTS_REJECTED":{
+    case "FETCH_STUDENTS_MAJOR_REJECTED":{
       return {...state, fetching: false, error: action.payload};
     }
-    case "FETCH_ALL_STUDENTS_FULFILLED": {
+    case "FETCH_STUDENTS_MAJOR_FULFILLED": {
       return {...state, fetching: false, fetched: true, students: action.payload};
+    }
+
+    case "FETCH_STUDENTS_MINOR":{
+      return {...state, fetching: true, fetched: false};
+    }
+    case "FETCH_STUDENTS_MINOR_REJECTED":{
+      return {...state, fetching: false, error: action.payload};
+    }
+    case "FETCH_STUDENTS_MINOR_FULFILLED": {
+      var newStudents = action.payload;
+      for(var i = 0; i < state.students.length; i++){
+        state.students[i].location = newStudents[i].location;
+      }
+      return {...state, fetching: false, fetched: true, students: newStudents};
     }
 
     case "ADD_STUDENT":{

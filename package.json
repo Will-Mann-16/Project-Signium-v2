@@ -2,7 +2,7 @@
   "name": "project-signium",
   "version": "0.2.0",
   "description": "A Signing In System for schools to use.",
-  "main": "src/server.js",
+  "main": "webpack.config.js",
   "dependencies": {
     "axios": "^0.16.2",
     "babel-core": "^6.25.0",

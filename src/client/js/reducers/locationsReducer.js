@@ -6,13 +6,13 @@ export default function reducer(state={
 }, action){
 
   switch(action.type){
-    case "FETCH_ALL_LOCATIONS":{
+    case "FETCH_LOCATIONS":{
       return {...state, fetching: true, fetched: false};
     }
-    case "FETCH_ALL_LOCATIONS_REJECTED":{
+    case "FETCH_LOCATIONS_REJECTED":{
       return {...state, fetching: false, error: action.payload};
     }
-    case "FETCH_ALL_LOCATIONS_FULFILLED": {
+    case "FETCH_LOCATIONS_FULFILLED": {
       return {...state, fetching: false, fetched: true, locations: action.payload};
     }
 

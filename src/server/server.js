@@ -17,7 +17,11 @@ var studentSchema = mongoose.Schema({
     firstname: String,
     surname: String,
     yeargroup: String,
-    location: Number,
+    location: {
+        id: Number,
+        name: String,
+        colour: String
+    },
     house: Number,
     timelastout: Date
 });
@@ -65,7 +69,7 @@ var locationRoutes = express.Router();
 userRoutes.post("/authenticate", function(req, res) {
     var username = req.body.username.toLowerCase();
     var password = req.body.password;
-
+    var dateMultiply = req.body.remember ? 365 : 1;
     var userQuery = User.findOne({
         'username': username
     });
@@ -73,10 +77,17 @@ userRoutes.post("/authenticate", function(req, res) {
     userQuery.exec(function(err, hash) {
         if (err) {
             res.json({
-                success: false
+                success: false,
+                reason: err.message
             });
         }
         bcrypt.compare(password, hash.password, function(err, result) {
+            if(err){
+              res.json({
+                success: false,
+                reason: err.message
+              })
+            }
             if (result) {
                 userQuery.select('-password');
                 userQuery.exec(function(err1, user) {
@@ -88,18 +99,19 @@ userRoutes.post("/authenticate", function(req, res) {
                     }
                     res.json({
                         success: true,
+                        authenticated: true,
                         token: jwt.sign({
-                            data: user;
+                            data: user
                         }, secretKey, {
-                            expiresIn: 60 * 60 * 24
-                        });
+                            expiresIn: 60 * 60 * 24 * dateMultiply
+                        })
                     });
                 });
 
             } else {
                 res.json({
-                    success: false,
-                    reason: err
+                    success: true,
+                    authenticated: false
                 });
             }
         });
@@ -117,7 +129,7 @@ userRoutes.post("/read", function(req, res) {
         }
         res.json({
             success: true,
-            user: decoded;
+            user: decoded
         })
     });
 });
@@ -198,25 +210,24 @@ studentRoutes.post("/create", function(req, res) {
 });
 
 studentRoutes.get("/read", function(req, res) {
-    if (req.body.ids) {
-        var result = [];
-        req.body.ids.forEach(function(id) {
-            Student.findById(id, function(err, student) {
-                if (err) {
-                    res.json({
-                        success: false,
-                        reason: err.message
-                    });
-                }
-                result.push(student);
+    var minor = req.body.minor;
+    if (minor) {
+        Student.find({"house": req.body.house}, {
+            "location" : true
+        }, function(err, students) {
+            if (err) {
+                res.json({
+                    success: false,
+                    reason: err.message
+                });
+            }
+            res.json({
+                success: true,
+                students: students
             });
         });
-        res.json({
-            success: true,
-            students: result
-        });
     } else {
-        Student.find({}, function(err, students) {
+        Student.find({"house" : req.body.house}, function(err, students) {
             if (err) {
                 res.json({
                     success: false,
@@ -248,9 +259,14 @@ studentRoutes.post("/update", function(req, res) {
 
 studentRoutes.get("/update-location", function(req, res) {
     results = [];
+    var newLocation = {
+        id: req.body.location.id,
+        name: req.body.location.name,
+        colour: req.body.location.colour
+    };
     req.body.ids.forEach(function(id) {
         Student.findByIdAndUpdate(id, {
-            location: req.body.location,
+            location: newLocation,
             timelastout: new Date()
         }, function(err, student) {
             if (err) {
@@ -297,7 +313,7 @@ locationRoutes.post("/create", function(req, res) {
     })
 });
 locationRoutes.get("/read", function(req, res) {
-    Location.find({}, function(err, locations) {
+    Location.find({"house": req.body.house}, function(err, locations) {
         if (err) {
             res.json({
                 success: false,
@@ -347,6 +363,41 @@ app.use('/api', apiRoutes);
 
 app.use(express.static("./public"));
 
+var sockets = [];
 io.on("connect", function(socket) {
-
+    var socketHouse, socketAdmin, socketRole;
+    socket.on("socket-client-server-init", function(packet) {
+        packet = JSON.parse(packet);
+        sockets[packet.house].push({
+            socket: socket,
+            admin: packet.admin,
+            role: packet.role
+        });
+        socketHouse = packet.house;
+        socketAdmin = packet.admin;
+        socketRole = packet.role;
+        socket.emit("socket-server-client-init");
+    });
+    socket.on("socket-client-server-redraw-major", function() {
+        sockets[socketHouse].forEach(function(clientSocket) {
+            clientSocket.socket.emit("socket-server-client-redraw-major", {
+                house: socketHouse
+            });
+        });
+    });
+    socket.on("socket-client-server-redraw-minor", function() {
+        sockets[socketHouse].forEach(function(clientSocket) {
+            clientSocket.socket.emit("socket-server-client-redraw-minor", {
+                house: socketHouse
+            });
+        });
+    });
+    socket.on("disconnect", function() {
+        var indexOf = sockets[socketHouse].indexOf({
+            socket: socket,
+            admin: socketAdmin,
+            role: socketRole
+        });
+        sockets[socketHouse].splice(indexOf, 0);
+    });
 });
