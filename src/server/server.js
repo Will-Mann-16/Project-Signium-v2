@@ -4,6 +4,7 @@ var http = require("http");
 var bodyParser = require("body-parser");
 var app = express();
 var server = http.createServer(app).listen(3000);
+var io = socketio.listen(server);
 
 var bcrypt = require('bcrypt');
 var saltRounds = 10;
