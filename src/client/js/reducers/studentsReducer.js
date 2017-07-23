@@ -1,5 +1,6 @@
 export default function reducer(state={
   students: [],
+  selected: [],
   fetching: false,
   fetched: false,
   error: null
@@ -24,10 +25,23 @@ export default function reducer(state={
     }
     case "FETCH_STUDENTS_MINOR_FULFILLED": {
       var newStudents = action.payload;
+      var students = state. students;
       for(var i = 0; i < state.students.length; i++){
-        state.students[i].location = newStudents[i].location;
+        students[i].location = newStudents[i].location;
       }
-      return {...state, fetching: false, fetched: true, students: newStudents};
+      return {...state, fetching: false, fetched: true, students: students};
+    }
+
+    case "SELECT_STUDENT":{
+      var selected = state.selected;
+      selected.push(action.payload);
+      return {...state, selected: selected};
+    }
+    case "DESELECT_STUDENT":{
+      var selected = state.selected;
+      var indexOf = selected.indexOf(action.payload);
+      selected.splice(indexOf)
+      return {...state, selected: selected};
     }
 
     case "ADD_STUDENT":{
@@ -69,5 +83,10 @@ export default function reducer(state={
     case "DELETE_STUDENT_FULFILLED": {
       return {...state, fetching: false, fetched: true};
     }
+
+
+        default:{
+          return state;
+        }
   }
 }

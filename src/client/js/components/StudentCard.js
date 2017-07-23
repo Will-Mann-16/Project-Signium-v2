@@ -1,35 +1,35 @@
 import React from 'react';
-import {connect} from 'react-redux';
 
-class StudentCard extends React.Component{
+export default class StudentCard extends React.Component{
   constructor(){
     super();
-    this.props.locations.forEach(function(key, val){
-      if(val.ID == this.props.location){
-        this.state = {
-          location: val
-        }
-      }
-    })
+    this.state = {
+      selected: false
+    };
   }
+
+  select(){
+    this.setState({
+      selected: this.state.selected ? false: true
+    });
+    this.props.addSelected(this.props.student._id);
+  }
+
   render(){
-    const borderStyle = {
-      borderColor: this.state.location.colour
+    const locationStyle = {
+      borderColor: this.props.student.location.colour
+    }
+    const selectedStyle = {
+      borderColor: "#00FF00"
     }
     return(
-      <div style={borderStyle}>
-        <p>{this.props.firstname} {this.props.surname}</p>
-        <p>{this.props.yeargroup}</p>
-        <p>{this.state.location.name}</p>
+      <div style={locationStyle} class="student-card" onClick={this.select.bind(this)}>
+        <div class="student-card-body" style={this.state.selected ? selectedStyle : ""}>
+          <p>{this.props.student.firstname} {this.props.student.surname}</p>
+          <p>{this.props.student.yeargroup}</p>
+          <p>{this.props.student.location.name}</p>
+        </div>
       </div>
     );
   }
 }
-
-function mapStateToProps(state){
-  return{
-      locations: state.locations
-  }
-}
-
-export default connect(mapStateToProps)(StudentCard);

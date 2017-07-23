@@ -12,43 +12,8 @@ var saltRounds = 10;
 var secretKey = "signium";
 
 var mongoose = require("mongoose");
-mongoose.connect('mongodb://127.0.0.1:27017');
-
-var studentSchema = mongoose.Schema({
-    firstname: String,
-    surname: String,
-    yeargroup: String,
-    location: {
-        id: Number,
-        name: String,
-        colour: String
-    },
-    house: Number,
-    timelastout: Date
-});
-
-var locationSchema = mongoose.Schema({
-    name: String,
-    heading: String,
-    colour: String,
-    house: Number
-});
-
-var userSchema = mongoose.Schema({
-    username: {
-        type: String,
-        unique: true,
-        lowercase: true
-    },
-    password: String,
-    role: String,
-    house: Number
-}, {
-    runSettersOnQuery: true
-});
-var Student = mongoose.model("Student", studentSchema);
-var Location = mongoose.model("Location", locationSchema);
-var User = mongoose.model("User", userSchema);
+mongoose.connect('mongodb://127.0.0.1:27017/project-signium');
+var db = mongoose.connection;
 
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -61,103 +26,130 @@ app.use(bodyParser.urlencoded({
     extended: false
 }));
 
-var apiRoutes = express.Router();
+app.use(express.static("../client"));
 
-var studentRoutes = express.Router();
-var userRoutes = express.Router();
-var locationRoutes = express.Router();
 
-userRoutes.post("/authenticate", function(req, res) {
-    var username = req.body.username.toLowerCase();
-    var password = req.body.password;
-    var dateMultiply = req.body.remember ? 365 : 1;
-    var userQuery = User.findOne({
-        'username': username
-    });
-    userQuery.select('password');
-    userQuery.exec(function(err, hash) {
-        if (err) {
-            res.json({
-                success: false,
-                reason: err.message
-            });
-        }
-        bcrypt.compare(password, hash.password, function(err, result) {
-            if(err){
-              res.json({
-                success: false,
-                reason: err.message
-              })
-            }
-            if (result) {
-                userQuery.select('-password');
-                userQuery.exec(function(err1, user) {
-                    if (err1) {
-                        res.json({
-                            success: false,
-                            reason: err1.message
-                        })
-                    }
-                    res.json({
-                        success: true,
-                        authenticated: true,
-                        token: jwt.sign({
-                            data: user
-                        }, secretKey, {
-                            expiresIn: 60 * 60 * 24 * dateMultiply
-                        })
-                    });
-                });
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+db.once('open', function() {
+    var schema = require("./schema");
+    var User = schema.user;
+    var Student = schema.student;
+    var Location = schema.location;
+    var House = schema.house;
 
-            } else {
-                res.json({
-                    success: true,
-                    authenticated: false
-                });
-            }
+    var apiRoutes = express.Router();
+
+    var studentRoutes = express.Router();
+    var userRoutes = express.Router();
+    var locationRoutes = express.Router();
+
+    userRoutes.post("/authenticate", function(req, res) {
+        var username = req.query.username.toLowerCase();
+        var password = req.query.password;
+        var dateMultiply = req.query.remember ? 365 : 1;
+        var userQuery = User.findOne({
+            'username': username
         });
-    });
-});
-userRoutes.post("/read", function(req, res) {
-    var jwt_key = req.body.jwt;
-
-    jwt.verify(jwt_key, secretKey, function(err, decoded) {
-        if (err) {
-            res.json({
-                success: false,
-                reason: err
-            });
-        }
-        res.json({
-            success: true,
-            user: decoded
-        })
-    });
-});
-userRoutes.post("/create", function(req, res) {
-    var username = req.body.username.toLowerCase();
-    var password = req.body.password;
-    var role = req.body.role;
-    var house = req.body.house;
-    bcrypt.hash(password, saltRounds, function(err, hash) {
-        if (err) {
-            res.json({
-                success: false,
-                reason: err.message
-            });
-        }
-        password = hash;
-        var user = new User({
-            username: username,
-            password: password,
-            role: role,
-            house: house
-        });
-        user.save(function(error) {
-            if (error) {
+        userQuery.select('password');
+        userQuery.exec(function(err, hash) {
+            if (err) {
                 res.json({
                     success: false,
-                    reason: error.message
+                    reason: err.message
+                });
+            }
+            bcrypt.compare(password, hash.password, function(err, result) {
+                if (err) {
+                    res.json({
+                        success: false,
+                        reason: err.message
+                    });
+                }
+                if (result) {
+                    userQuery.select('-password');
+                    userQuery.exec(function(err1, user) {
+                        if (err1) {
+                            res.json({
+                                success: false,
+                                reason: err1.message
+                            });
+                        }
+                        res.json({
+                            success: true,
+                            authenticated: true,
+                            token: jwt.sign({
+                                data: user
+                            }, secretKey, {
+                                expiresIn: 60 * 60 * 24 * dateMultiply
+                            })
+                        });
+                    });
+
+                } else {
+                    res.json({
+                        success: true,
+                        authenticated: false
+                    });
+                }
+            });
+        });
+    });
+    userRoutes.post("/read", function(req, res) {
+        var jwt_key = req.query.jwt;
+
+        jwt.verify(jwt_key, secretKey, function(err, decoded) {
+            if (err) {
+                res.json({
+                    success: false,
+                    reason: err
+                });
+            }
+            res.json({
+                success: true,
+                user: decoded
+            });
+        });
+    });
+    userRoutes.post("/create", function(req, res) {
+        var username = req.query.username.toLowerCase();
+        var password = req.query.password;
+        var role = req.query.role;
+        var house = req.query.house;
+        var firstname = req.query.firstname;
+        var surname = req.query.surname;
+        bcrypt.hash(password, saltRounds, function(err, hash) {
+            if (err) {
+                res.json({
+                    success: false,
+                    reason: err.message
+                });
+            }
+            password = hash;
+            var user = User.create({
+                username: username,
+                password: password,
+                role: role,
+                house: house
+            }, function(error, user) {
+                if (error) {
+                    res.json({
+                        success: false,
+                        reason: error.message
+                    });
+                }
+                res.json({
+                    success: true
+                });
+            });
+        });
+    });
+
+    userRoutes.post("/update", function(req, res) {
+        User.findByIdAndUpdate(id, req.query.user, function(err, user) {
+            if (err) {
+                res.json({
+                    success: false,
+                    reason: err.message
                 });
             }
             res.json({
@@ -165,57 +157,72 @@ userRoutes.post("/create", function(req, res) {
             });
         });
     });
-});
 
-userRoutes.post("/update", function(req, res) {
-    User.findByIdAndUpdate(id, req.body.user, function(err, user) {
-        if (err) {
+    userRoutes.post("/delete", function(req, res) {
+        User.findByIdAndRemove(req.query.id, function(err, user) {
+            if (err) {
+                res.json({
+                    success: false,
+                    reason: err.message
+                });
+            }
             res.json({
-                success: false,
-                reason: err.message
+                success: true
             });
-        }
-        res.json({
-            success: true
         });
-    })
-});
+    });
 
-userRoutes.get("/delete", function(req, res) {
-    User.findByIdAndRemove(req.body.id, function(err, user) {
-        if (err) {
+    studentRoutes.post("/create", function(req, res) {
+        var newStudent = Student.create(req.query, function(err, student) {
+            if (err) {
+                res.json({
+                    success: false,
+                    reason: err.message
+                });
+            }
             res.json({
-                success: false,
-                reason: err.message
+                success: true
+            });
+        });
+    });
+
+    studentRoutes.get("/read", function(req, res) {
+        var minor = req.query.minor;
+        if (minor) {
+            Student.find({
+                "_house": req.query.house
+            }, 'location timelastout', function(err, students) {
+                if (err) {
+                    res.json({
+                        success: false,
+                        reason: err.message
+                    });
+                }
+                res.json({
+                    success: true,
+                    students: students
+                });
+            });
+        } else {
+            Student.find({
+                "_house": req.query.house
+            }, function(err, students) {
+                if (err) {
+                    res.json({
+                        success: false,
+                        reason: err.message
+                    });
+                }
+                res.json({
+                    success: true,
+                    students: students
+                });
             });
         }
-        res.json({
-            success: true
-        })
     });
-});
 
-studentRoutes.post("/create", function(req, res) {
-    var newStudent = new Student(req.body);
-    newStudent.save(function(err) {
-        if (err) {
-            res.json({
-                success: false,
-                reason: err.message
-            });
-        }
-        res.json({
-            success: true
-        })
-    });
-});
-
-studentRoutes.get("/read", function(req, res) {
-    var minor = req.body.minor;
-    if (minor) {
-        Student.find({"house": req.body.house}, {
-            "location" : true
-        }, function(err, students) {
+    studentRoutes.post("/update", function(req, res) {
+        Student.findByIdAndUpdate(req.query.id, req.query.student, function(err, student) {
             if (err) {
                 res.json({
                     success: false,
@@ -224,11 +231,69 @@ studentRoutes.get("/read", function(req, res) {
             }
             res.json({
                 success: true,
-                students: students
+                student: student
             });
         });
-    } else {
-        Student.find({"house" : req.body.house}, function(err, students) {
+    });
+
+    studentRoutes.get("/update-location", function(req, res) {
+        results = [];
+        var newLocation = {
+            id: req.query.location.id,
+            name: req.query.location.name,
+            colour: req.query.location.colour
+        };
+        req.query.ids.forEach(function(id) {
+            Student.findByIdAndUpdate(id, {
+                location: newLocation,
+                timelastout: new Date()
+            }, function(err, student) {
+                if (err) {
+                    res.json({
+                        success: false,
+                        reason: err.message
+                    });
+                }
+                results.push(student);
+            });
+        });
+        res.json({
+            success: true,
+            students: results
+        });
+    });
+
+    studentRoutes.get("/delete", function(req, res) {
+        Student.findByIdAndRemove(req.query.id, function(err, user) {
+            if (err) {
+                res.json({
+                    success: false,
+                    reason: err.message
+                });
+            }
+            res.json({
+                success: true
+            });
+        });
+    });
+
+    locationRoutes.post("/create", function(req, res) {
+        var newLocation = Location.create(req.query, function(err) {
+            if (err) {
+                res.json({
+                    success: false,
+                    reason: err.message
+                });
+            }
+            res.json({
+                success: true
+            });
+        });
+    });
+    locationRoutes.get("/read", function(req, res) {
+        Location.find({
+            "_house": req.query.house
+        }, function(err, locations) {
             if (err) {
                 res.json({
                     success: false,
@@ -237,132 +302,45 @@ studentRoutes.get("/read", function(req, res) {
             }
             res.json({
                 success: true,
-                students: students
+                locations: locations
             });
         });
-    }
-});
-
-studentRoutes.post("/update", function(req, res) {
-    Student.findByIdAndUpdate(req.body.id, req.body.student, function(err, student) {
-        if (err) {
-            res.json({
-                success: false,
-                reason: err.message
-            });
-        }
-        res.json({
-            success: true,
-            student: student
-        })
     });
-});
-
-studentRoutes.get("/update-location", function(req, res) {
-    results = [];
-    var newLocation = {
-        id: req.body.location.id,
-        name: req.body.location.name,
-        colour: req.body.location.colour
-    };
-    req.body.ids.forEach(function(id) {
-        Student.findByIdAndUpdate(id, {
-            location: newLocation,
-            timelastout: new Date()
-        }, function(err, student) {
+    locationRoutes.post("/update", function(req, res) {
+        Location.findByIdAndUpdate(req.query.id, req.query.location, function(err, location) {
             if (err) {
                 res.json({
                     success: false,
                     reason: err.message
                 });
             }
-            results.push(student);
+            res.json({
+                success: true,
+                location: location
+            });
         });
     });
-    res.json({
-        success: true,
-        students: results
-    });
-});
-
-studentRoutes.get("/delete", function(req, res) {
-    Student.findByIdAndRemove(req.body.id, function(err, user) {
-        if (err) {
+    locationRoutes.get("/delete", function(req, res) {
+        Location.findByIdAndRemove(req.query.id, function(err) {
+            if (err) {
+                res.json({
+                    success: false,
+                    reason: err.message
+                });
+            }
             res.json({
-                success: false,
-                reason: err.message
+                success: true
             });
-        }
-        res.json({
-            success: true
-        })
-    });
-});
-
-locationRoutes.post("/create", function(req, res) {
-    var newLocation = new Location(req.body);
-    newLocation.save(function(err) {
-        if (err) {
-            res.json({
-                success: false,
-                reason: err.message
-            });
-        }
-        res.json({
-            success: true
-        });
-    })
-});
-locationRoutes.get("/read", function(req, res) {
-    Location.find({"house": req.body.house}, function(err, locations) {
-        if (err) {
-            res.json({
-                success: false,
-                reason: err.message
-            });
-        }
-        res.json({
-            success: true,
-            locations: locations
         });
     });
+
+
+    apiRoutes.use('/students', studentRoutes);
+    apiRoutes.use('/users', userRoutes);
+    apiRoutes.use('/locations', locationRoutes);
+
+    app.use('/api', apiRoutes);
 });
-locationRoutes.post("/update", function(req, res) {
-    Location.findByIdAndUpdate(req.body.id, req.body.location, function(err, location) {
-        if (err) {
-            res.json({
-                success: false,
-                reason: err.message
-            });
-        }
-        res.json({
-            success: true,
-            location: location
-        });
-    });
-});
-locationRoutes.get("/delete", function(req, res) {
-    Location.findByIdAndRemove(req.body.id, function(err) {
-        if (err) {
-            res.json({
-                success: false,
-                reason: err.message
-            });
-        }
-        res.json({
-            success: true
-        });
-    });
-});
-
-
-apiRoutes.use('/students', studentRoutes);
-apiRoutes.use('/users', userRoutes);
-apiRoutes.use('/locations', locationRoutes);
-
-app.use('/api', apiRoutes);
-
-app.use(express.static("./public"));
 
 var sockets = [];
 io.on("connect", function(socket) {

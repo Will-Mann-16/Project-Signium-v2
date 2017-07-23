@@ -4,16 +4,11 @@ import {Link} from "react-router-dom";
 
 class Navbar extends React.Component{
   render(){
-    const linkList = [
-      {
-        name: "Home",
-        path: "mainpage"
-      }
-    ];
     return(
-      <div>
-
-      </div>
+      <nav class="main-topnav">
+        <a>Home</a>
+        <a>Welcome back, {this.props.user.user.firstname}</a>
+      </nav>
     );
   }
 }

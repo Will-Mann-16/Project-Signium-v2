@@ -1,3 +1,4 @@
+/*jshint esversion: 6 */
 import axios from "axios";
 import { socket, house, scriptsDirectory } from "./../socket.js";
 
@@ -14,7 +15,7 @@ export function fetchLocations(){
     }).catch((err) =>{
       dispatch({type: "FETCH_LOCATIONS_REJECTED", payload: err});
     });
-  }
+  };
 }
 
 export function addLocation(location){
@@ -30,7 +31,7 @@ export function addLocation(location){
       }
       dispatch({type: "ADD_LOCATION_REJECTED", payload: err});
     });
-  }
+  };
 }
 
 export function updateLocation(id, location){
@@ -47,7 +48,7 @@ export function updateLocation(id, location){
     }).catch((err) =>{
       dispatch({type: "UPDATE_LOCATION_REJECTED", payload: err});
     });
-  }
+  };
 }
 
 export function deleteLocation(id){
@@ -64,5 +65,5 @@ export function deleteLocation(id){
     }).catch((err) =>{
       dispatch({type: "DELETE_LOCATION_REJECTED", payload: err});
     });
-  }
+  };
 }

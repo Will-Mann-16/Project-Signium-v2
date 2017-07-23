@@ -31,7 +31,7 @@ class LoginPage extends React.Component{
   render(){
     <div class="container login-form">
       <h3>Login</h3>
-      <input name="email" type="email" placeholder="Email Address" class={this.state.authenticatedClass} onChange={this.handleChange.bind(this)}/>
+      <input name="username" type="text" placeholder="Username" class={this.state.authenticatedClass} onChange={this.handleChange.bind(this)}/>
       <input name="password" type="password" placeholder="Password" class={this.state.authenticatedClass} onChange={this.handleChange.bind(this)}/>
       <button onClick={this.submitLogin.bind(this)}>Login</button>
       <div class={this.state.loadingClass}></div>

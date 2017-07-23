@@ -1,3 +1,4 @@
+/*jshint esversion: 6 */
 import axios from "axios";
 import { scriptsDirectory } from "./../socket.js";
 
@@ -21,7 +22,7 @@ export function requestLogin(username, password, remember){
     }).catch((err) =>{
       dispatch({type: "USER_LOGIN_REQUEST_REJECTED", payload: err});
     });
-  }
+  };
 }
 
 export function requestLogout(){
@@ -32,7 +33,7 @@ export function requestLogout(){
     }).catch((err) =>{
       dispatch({type: "USER_LOGOUT_REQUEST_REJECTED", payload: err});
     });
-  }
+  };
 }
 
 export function fetchUserData(){
@@ -47,5 +48,5 @@ export function fetchUserData(){
     }).catch((err) =>{
       dispatch({type: "USER_FETCH_DATA_REJECTED", payload: err});
     });
-  }
+  };
 }

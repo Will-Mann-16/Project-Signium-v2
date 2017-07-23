@@ -45,5 +45,9 @@ export default function reducer(state={
     case "DELETE_LOCATION_FULFILLED": {
       return {...state, fetching: false, fetched: true};
     }
+
+    default:{
+      return state;
+    }
   }
 }

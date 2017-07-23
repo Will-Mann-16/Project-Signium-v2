@@ -5,7 +5,7 @@ import io from "socket.io-client";
 const HOST_IP = "";
 
 // TODO create house method
-export const house = 0;
+export const house = "5967afdecb778775c45e5be0";
 
 export const scriptsDirectory = "http://localhost:3000/api/";
 

@@ -1,3 +1,4 @@
+/*jshint esversion: 6 */
 import axios from "axios";
 import { socket, house, scriptsDirectory } from "./../socket.js";
 
@@ -9,7 +10,7 @@ export function fetchStudentsMajor(){
     }).catch((err) =>{
       dispatch({type: "FETCH_STUDENTS_MAJOR_REJECTED", payload: err});
     });
-  }
+  };
 }
 
 export function fetchStudentsMinor(){
@@ -25,6 +26,17 @@ export function fetchStudentsMinor(){
       }    }).catch((err) =>{
       dispatch({type: "FETCH_STUDENTS_MINOR_REJECTED", payload: err});
     });
+  };
+}
+
+export function selectStudent(id){
+  return dispatch => {
+    dispatch({type: "SELECT_STUDENT", payload: id});
+  }
+}
+export function deselectStudent(id){
+  return dispatch => {
+    dispatch({type: "DESELECT_STUDENT", payload: id});
   }
 }
 
@@ -42,7 +54,7 @@ export function addStudent(student){
     }).catch((err) =>{
       dispatch({type: "ADD_STUDENT_REJECTED", payload: err});
     });
-  }
+  };
 }
 
 export function updateStudentLocation(ids, location){
@@ -59,7 +71,7 @@ export function updateStudentLocation(ids, location){
     }).catch((err) =>{
       dispatch({type: "UPDATE_STUDENT_LOCATION_REJECTED", payload: err});
     });
-  }
+  };
 }
 
 export function updateStudent(id, student){
@@ -76,7 +88,7 @@ export function updateStudent(id, student){
     }).catch((err) =>{
       dispatch({type: "UPDATE_STUDENT_REJECTED", payload: err});
     });
-  }
+  };
 }
 
 export function deleteStudent(id){
@@ -93,5 +105,5 @@ export function deleteStudent(id){
     }).catch((err) =>{
       dispatch({type: "DELETE_STUDENT_REJECTED", payload: err});
     });
-  }
+  };
 }

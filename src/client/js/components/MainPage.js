@@ -1,13 +1,11 @@
 import React from 'react';
 
-import StudentGrid from './StudentGrid';
+import ViewGrid from './ViewGrid';
 
-const MainPage = React.ceateClass({
+export default class MainPage{
   render(){
     return(
-      <StudentGrid/>
+      <ViewGrid/>
     );
   }
-});
-
-export default MainPage;
+}

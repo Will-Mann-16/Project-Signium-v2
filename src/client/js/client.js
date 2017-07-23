@@ -6,9 +6,8 @@ import App from "./components/App";
 import store from "./store";
 import {activateListener} from "./socket";
 
-const app = document.getElementById('app');
 activateListener(store);
 ReactDOM.render(<Provider store={store}>
     <App />
   </Provider>
-, app);
+, document.getElementById('app'));
