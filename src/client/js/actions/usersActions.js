@@ -2,10 +2,10 @@
 import axios from "axios";
 import { scriptsDirectory } from "./../socket.js";
 
-export function requestLogin(username, password, remember){
+export function requestLogin(username, password){
   return dispatch => {
     dispatch({type: "USER_LOGIN_REQUEST"});
-    axios.post(scriptsDirectory + "users/authenticate", {params: {username: username, password: password, remember: remember}}).then((response) =>{
+    axios.post(scriptsDirectory + "users/authenticate", {params: {username: username, password: password}}).then((response) =>{
       if(response.data.success){
         if(!response.data.authenticated){
           dispatch({type: "USER_LOGIN_REQUEST_DENIED", payload: false});
@@ -39,7 +39,7 @@ export function requestLogout(){
 export function fetchUserData(){
   return dispatch => {
     dispatch({type: "USER_FETCH_DATA"});
-    axios.post(scriptsDirectory + "users/read", {params: { jwt: localStorage.getItem("AUTH-TOKEN") }}).then((response) =>{
+    axios.post(scriptsDirectory + "users/read", {params: { jwt: localStorage.getItem("AUTH-TOKEN") ? localStorage.getItem("AUTH-TOKEN") : false }}).then((response) =>{
         if(response.data.success){
           dispatch({type: "USER_FETCH_DATA_FULFILLED", payload: response.data.user});
         }else{

@@ -1,0 +1,273 @@
+/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline; }
+
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block; }
+
+body {
+  line-height: 1; }
+
+ol, ul {
+  list-style: none; }
+
+blockquote, q {
+  quotes: none; }
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none; }
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0; }
+
+* {
+  font-family: sans-serif;
+  font-size: 16px; }
+
+.btn-green, .btn-blue, .btn-orange, .btn-red, .btn-gray, .btn-african-sapphire, .btn-serpentine, .btn-apple-jade, .btn-black-onyx {
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block; }
+
+.btn-green-xs, .btn-blue-xs, .btn-orange-xs, .btn-red-xs, .btn-gray-xs, .btn-african-sapphire-xs, .btn-serpentine-xs, .btn-apple-jade-xs, .btn-black-onyx-xs {
+  font-size: 10px; }
+
+.btn-green-s, .btn-blue-s, .btn-orange-s, .btn-red-s, .btn-gray-s, .btn-african-sapphire-s, .btn-serpentine-s, .btn-apple-jade-s, .btn-black-onyx-s {
+  font-size: 12px; }
+
+.btn-green-l, .btn-blue-l, .btn-orange-l, .btn-red-l, .btn-gray-l, .btn-african-sapphire-l, .btn-serpentine-l, .btn-apple-jade-l, .btn-black-onyx-l {
+  font-size: 20px; }
+
+.btn-green-xl, .btn-blue-xl, .btn-orange-xl, .btn-red-xl, .btn-gray-xl, .btn-african-sapphire-xl, .btn-serpentine-xl, .btn-apple-jade-xl, .btn-black-onyx-xl {
+  font-size: 24px; }
+
+.btn-green {
+  background-color: #4CAF50; }
+  .btn-green:hover {
+    background-color: #3d8b40; }
+.btn-blue {
+  background-color: #2196F3; }
+  .btn-blue:hover {
+    background-color: #0c7cd5; }
+.btn-orange {
+  background-color: #FF9800; }
+  .btn-orange:hover {
+    background-color: #cc7a00; }
+.btn-red {
+  background-color: #F44336; }
+  .btn-red:hover {
+    background-color: #ea1c0d; }
+.btn-gray {
+  background-color: #E7E7E7; }
+  .btn-gray:hover {
+    background-color: #cecece; }
+.btn-african-sapphire {
+  background-color: #271747; }
+  .btn-african-sapphire:hover {
+    background-color: #120b20; }
+.btn-serpentine {
+  background-color: #173F35; }
+  .btn-serpentine:hover {
+    background-color: #091a16; }
+.btn-apple-jade {
+  background-color: #008755; }
+  .btn-apple-jade:hover {
+    background-color: #005435; }
+.btn-black-onyx {
+  background-color: #2D2926; }
+  .btn-black-onyx:hover {
+    background-color: #11100f; }
+
+.table {
+  border-collapse: collapse;
+  background-color: white;
+  width: 100%; }
+  .table th {
+    font-weight: 600; }
+  .table td, .table th {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #cecece; }
+  .table-striped tr:nth-child(even) {
+    background-color: #E7E7E7; }
+  .table-striped-hover tr:hover {
+    background-color: #cecece; }
+  .table-bottom {
+    border-bottom: 1px solid #cecece; }
+  .table-hover tr:hover {
+    background-color: #cecece; }
+
+body {
+  background-color: #ededed; }
+
+.modal {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 50px; }
+  .modal .modal-body {
+    background-color: white;
+    max-width: 500;
+    min-width: 300;
+    margin: 0 auto;
+    padding: 30px; }
+
+.container {
+  max-width: 960px;
+  margin-top: 50px;
+  margin-bottom: auto;
+  margin-left: auto;
+  margin-right: auto; }
+  .container-large {
+    margin-top: 50px;
+    margin-bottom: auto;
+    margin-left: 10px;
+    margin-right: 10px; }
+
+* {
+  box-sizing: border-box; }
+
+[class*="col-"] {
+  float: left;
+  width: 100%; }
+
+@media only screen and (min-width: 768px) {
+  .col-1 {
+    width: 8.33333%; }
+
+  .col-2 {
+    width: 16.66667%; }
+
+  .col-3 {
+    width: 25%; }
+
+  .col-4 {
+    width: 33.33333%; }
+
+  .col-5 {
+    width: 41.66667%; }
+
+  .col-6 {
+    width: 50%; }
+
+  .col-7 {
+    width: 58.33333%; }
+
+  .col-8 {
+    width: 66.66667%; }
+
+  .col-9 {
+    width: 75%; }
+
+  .col-10 {
+    width: 83.33333%; }
+
+  .col-11 {
+    width: 91.66667%; }
+
+  .col-12 {
+    width: 100%; } }
+.row::after {
+  content: "";
+  clear: both;
+  display: table; }
+
+.main-topnav {
+  background-color: #2D2926;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  overflow: hidden;
+  z-index: 100; }
+  .main-topnav a {
+    float: left;
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none; }
+    .main-topnav a:hover {
+      background-color: black; }
+
+.student-card {
+  cursor: pointer;
+  border-radius: 20px;
+  border: 5px solid black;
+  -webkit-box-shadow: 6px 6px 7px 0px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: 6px 6px 7px 0px rgba(0, 0, 0, 0.75);
+  box-shadow: 6px 6px 7px 0px rgba(0, 0, 0, 0.75);
+  width: auto;
+  height: auto;
+  float: left;
+  background-color: white;
+  margin: 0 auto; }
+  .student-card-body {
+    padding: 5px;
+    font-weight: 600;
+    text-align: center;
+    position: relative;
+    border: 5px solid white;
+    border-radius: 10px;
+    min-height: 165px;
+    max-height: 180px;
+    min-width: 120px;
+    max-width: 130px; }
+    .student-card-body-name {
+      position: absolute;
+      left: 0;
+      top: 40%;
+      right: 0; }
+    .student-card-body-bottom {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0; }
+    .student-card-body-date {
+      position: absolute;
+      top: 10%;
+      right: 1%;
+      text-align: right;
+      font-size: 16px;
+      color: #E7E7E7; }
+
+.location-button {
+  cursor: pointer;
+  font-weight: 600;
+  color: white;
+  width: 100%;
+  padding: 14px 16px;
+  text-align: center;
+  margin: 5px; }
+
+/*# sourceMappingURL=style.min.css.map */

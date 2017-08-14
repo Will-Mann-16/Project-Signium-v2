@@ -1,32 +1,57 @@
 import React from "react";
-import { BrowserRouter, Switch, Route } from "react-router-dom";
+import {Route, Switch} from 'react-router-dom';
+import {ConnectedRouter, push} from 'react-router-redux';
+import { connect } from "react-redux"
 
 import MainSectionLayout from './MainSectionLayout';
 
-import MainPage from './MainPage';
-import LoginPage from './LoginPage';
-import ViewPage from './ViewPage';
-import StudentListPage from "./StudentListPage";
-import StudentPage from './StudentPage';
-import LocationListPage from "./LocationListPage";
-import LocationPage from './LocationPage';
+import {fetchUserData} from "../actions/usersActions";
+import {activateListener} from "../socket";
 
 
-export default class App extends React.Component{
-  render(){
-    return(
-        <BrowserRouter>
+import LoginModal from './LoginModal';
+
+const NoMatch = ({location}) => (
+  <div>
+    <h1>Error - 404</h1>
+    <h3>No match for
+      <code>{location.pathname}</code>
+    </h3>
+  </div>
+);
+
+class App extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      showLogin: !this.props.user.authenticated
+    }
+  }
+  componentWillMount() {
+    this.props.dispatch(fetchUserData());
+  }
+  componentWillReceiveProps(newProps){
+    if(newProps.user.authenticated){
+      activateListener(newProps.dispatch);
+    }
+  }
+  render() {
+    return (
+      <ConnectedRouter history={this.props.history}>
         <Switch>
-            <Route path="/" component={MainSectionLayout}></Route>
-            <Route exact path="/" name="mainpage" component={MainPage}></Route>
-            <Route path="login" name="login" componenet={LoginPage}></Route>
-            <Route path="view" name="view" component={ViewPage}></Route>
-            <Route exact path="students" name="studentlist" component={StudentListPage}></Route>
-            <Route path="students/:student" name="student" component={StudentPage}></Route>
-            <Route exact path="locations" name="locationlist" component={LocationListPage}></Route>
-            <Route path="locations/:location" name="location" component={LocationPage}></Route>
+          <MainSectionLayout/>
+          <LoginModal show={this.state.showLogin}/>
+          <Route component={NoMatch}/>
         </Switch>
-        </BrowserRouter>
-  );
+      </ConnectedRouter>
+    );
   }
 }
+
+function mapStateToProps(state){
+  return{
+    user: state.user
+  }
+}
+
+export default connect(mapStateToProps)(App)

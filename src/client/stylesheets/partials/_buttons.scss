@@ -1,0 +1,45 @@
+%btn{
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+}
+
+%btn-xs{
+  font-size: 10px;
+}
+%btn-s{
+  font-size: 12px;
+}
+%btn-l{
+  font-size: 20px;
+}
+%btn-xl{
+  font-size: 24px;
+}
+
+.btn{
+  @each $name, $colour in $colours{
+    &-#{$name}{
+      @extend %btn;
+      background-color: $colour;
+      &:hover{
+        background-color: darken($colour, 10%);
+      }
+      &-xs{
+        @extend %btn-xs;
+      }
+      &-s{
+        @extend %btn-s;
+      }
+      &-l{
+        @extend %btn-l;
+      }
+      &-xl{
+        @extend %btn-xl;
+      }
+    }
+  }
+}

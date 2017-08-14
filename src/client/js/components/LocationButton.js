@@ -2,7 +2,10 @@ import React from "react";
 
 export default class LocationButton extends React.Component{
   handleClick(){
-    this.props.updateLocation(this.props.location._id);
+    var thisLocation = this.props.location;
+    delete thisLocation.heading;
+    delete thisLocation.house;
+    this.props.updateLocation(thisLocation);
   }
   render(){
     var locationStyle = {

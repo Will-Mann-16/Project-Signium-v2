@@ -1,13 +1,13 @@
 import React from "react";
 import {connect} from "react-redux";
-import {Link} from "react-router-dom";
+import {NavLink} from "react-router-dom";
 
 class Navbar extends React.Component{
   render(){
     return(
       <nav class="main-topnav">
-        <a>Home</a>
-        <a>Welcome back, {this.props.user.user.firstname}</a>
+        <NavLink to="/">Home</NavLink>
+        <NavLink to="/students">Students</NavLink>
       </nav>
     );
   }
@@ -19,4 +19,4 @@ function mapStateToProps(state){
   };
 }
 
-export default connect(mapStateToProps)(Navbar);
+export default connect(mapStateToProps)(Navbar)

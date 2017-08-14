@@ -4,7 +4,6 @@ export default function reducer(state={
   fetched: false,
   error: null
 }, action){
-
   switch(action.type){
     case "FETCH_LOCATIONS":{
       return {...state, fetching: true, fetched: false};

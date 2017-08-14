@@ -5,8 +5,7 @@ export default function reducer(state={
   fetched: false,
   error: null
 }, action){
-
-  switch(action.type){
+    switch(action.type){
     case "FETCH_STUDENTS_MAJOR":{
       return {...state, fetching: true, fetched: false};
     }
@@ -25,9 +24,10 @@ export default function reducer(state={
     }
     case "FETCH_STUDENTS_MINOR_FULFILLED": {
       var newStudents = action.payload;
-      var students = state. students;
-      for(var i = 0; i < state.students.length; i++){
+      var students = Object.assign({}, state).students;
+      for(var i = 0; i < students.length; i++){
         students[i].location = newStudents[i].location;
+        students[i].timelastout = newStudents[i].timelastout;
       }
       return {...state, fetching: false, fetched: true, students: students};
     }

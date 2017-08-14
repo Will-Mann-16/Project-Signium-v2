@@ -5,12 +5,13 @@ var studentSchema = mongoose.Schema({
     surname: String,
     yeargroup: String,
     location: {
-        _id: String,
+        id: String,
         name: String,
         colour: String
     },
     _house: String,
-    timelastout: Date
+    timelastout: Date,
+    code: String
 });
 
 var locationSchema = mongoose.Schema({

@@ -6,6 +6,9 @@ module.exports = {
   context: path.join(__dirname, "src/client"),
   devtool: debug ? "inline-sourcemap" : false,
   entry: "./js/client.js",
+  devServer:{
+    contentBase: './src/client'
+  },
   module: {
     loaders: [{
       test: /\.jsx?$/,

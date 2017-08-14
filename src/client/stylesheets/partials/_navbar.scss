@@ -1,0 +1,19 @@
+.main-topnav{
+  background-color: $black-onyx;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  overflow: hidden;
+  z-index: 100;
+  a{
+    float: left;
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    &:hover{
+      background-color: black;
+    }
+  }
+}

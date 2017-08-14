@@ -2,18 +2,24 @@ import React from 'react';
 import {connect} from 'react-redux';
 
 import { house } from '../socket';
-import {fetchAllStudents, selectStudent, deselectStudent, updateLocation} from '../actions/studentsActions';
+import {fetchStudentsMajor, selectStudent, deselectStudent, updateStudentLocation} from '../actions/studentsActions';
+import {fetchLocations} from '../actions/locationsActions';
 
 import StudentCard from './StudentCard';
+import LocationButton from "./LocationButton";
 
-class StudentGrid extends React.Component{
-  constructor(){
-    super();
-    this.props.dispatch(fetchAllStudents());
+class ViewGrid extends React.Component{
+  componentWillMount(){
+    this.props.dispatch(fetchStudentsMajor());
+    this.props.dispatch(fetchLocations());
+    this.deselectAll();
+  }
+  deselectAll(){
     var selectedIDs = this.props.students.selected;
-    selectedIDs.forEach(function(val){
-      this.props.dispatch(deselectStudent(val));
-    });
+    for(var i = 0; i < selectedIDs.length; i++){
+      var id = selectedIDs[i];
+      this.props.dispatch(deselectStudent(id));
+    }
   }
   addSelected(id){
     var selectedIDs = this.props.students.selected;
@@ -26,28 +32,31 @@ class StudentGrid extends React.Component{
   }
   updateLocation(buttonID){
     var selectedIDs = this.props.students.selected;
-    this.props.dispatch(updateLocation(selectedIDs, buttonID));
-    selectedIDs.forEach(function(val){
-      this.props.dispatch(deselectStudent(val));
-    });
+    this.props.dispatch(updateStudentLocation(selectedIDs, buttonID));
+    this.deselectAll();
   }
   render(){
-    const studentHTML = this.props.students.students.map(student => {
-      return(<StudentCard student={student} addSelected={this.addSelected}/> );
+    const studentHTML = this.props.students.students.map((student, key) => {
+      return(<StudentCard student={student} key={key} addSelected={this.addSelected.bind(this)}/> );
     });
-    const locationHTML = this.props.locations.locations.map(location => {
-      return(<LocationButton location={location}  updateLocation={this.updateLocation}/>)
+    const locationHTML = this.props.locations.locations.map((location, key) => {
+      return(<LocationButton location={location} key={key} updateLocation={this.updateLocation.bind(this)}/>)
     })
     return(
-      <div>
+      <div id="view-grid" class="row container-large">
+        <div class="col-10">
         {studentHTML}
+      </div>
+      <div class="col-2">
+        {locationHTML}
+      </div>
     </div>
   );
   }
 }
 
 function mapStateToProps(state){
-  return { students: state.students };
+  return { students: state.students, locations: state.locations };
 }
 
-export default connect(mapStateToProps)(StudentGrid);
+export default connect(mapStateToProps)(ViewGrid);
