@@ -1,25 +1,17 @@
 import React from 'react';
 import {connect} from 'react-redux';
-
+import {withRouter} from 'react-router-dom';
 import { house } from '../socket';
-import {fetchStudentsMajor, selectStudent, deselectStudent, updateStudentLocation} from '../actions/studentsActions';
-import {fetchLocations} from '../actions/locationsActions';
+import {readStudentsMajor, selectStudent, deselectStudent, updateStudentLocation} from '../actions/studentsActions';
+import {readLocations} from '../actions/locationsActions';
 
 import StudentCard from './StudentCard';
 import LocationButton from "./LocationButton";
 
 class ViewGrid extends React.Component{
   componentWillMount(){
-    this.props.dispatch(fetchStudentsMajor());
-    this.props.dispatch(fetchLocations());
-    this.deselectAll();
-  }
-  deselectAll(){
-    var selectedIDs = this.props.students.selected;
-    for(var i = 0; i < selectedIDs.length; i++){
-      var id = selectedIDs[i];
-      this.props.dispatch(deselectStudent(id));
-    }
+    this.props.dispatch(readStudentsMajor(this.props.user.house));
+    this.props.dispatch(readLocations(this.props.user.house));
   }
   addSelected(id){
     var selectedIDs = this.props.students.selected;
@@ -33,17 +25,29 @@ class ViewGrid extends React.Component{
   updateLocation(buttonID){
     var selectedIDs = this.props.students.selected;
     this.props.dispatch(updateStudentLocation(selectedIDs, buttonID));
-    this.deselectAll();
   }
   render(){
     const studentHTML = this.props.students.students.map((student, key) => {
-      return(<StudentCard student={student} key={key} addSelected={this.addSelected.bind(this)}/> );
+      if(this.props.students.selected.indexOf(student._id) != -1){
+        return(<StudentCard selected student={student} key={key} addSelected={this.addSelected.bind(this)}/> );
+      }
+      else{
+        return(<StudentCard student={student} key={key} addSelected={this.addSelected.bind(this)}/> );
+      }
     });
+    var lastHeading;
     const locationHTML = this.props.locations.locations.map((location, key) => {
-      return(<LocationButton location={location} key={key} updateLocation={this.updateLocation.bind(this)}/>)
+      if(lastHeading != location.heading){
+        lastHeading = location.heading;
+        return(<LocationButton break location={location} key={key} updateLocation={this.updateLocation.bind(this)}/>)
+      }
+      else{
+        lastHeading = location.heading;
+        return(<LocationButton location={location} key={key} updateLocation={this.updateLocation.bind(this)}/>)
+      }
     })
     return(
-      <div id="view-grid" class="row container-large">
+      <div id="view-grid" class="row" style={{marginTop: 50}}>
         <div class="col-10">
         {studentHTML}
       </div>
@@ -56,7 +60,7 @@ class ViewGrid extends React.Component{
 }
 
 function mapStateToProps(state){
-  return { students: state.students, locations: state.locations };
+  return { students: state.students, locations: state.locations, user: state.user.user.data };
 }
 
-export default connect(mapStateToProps)(ViewGrid);
+export default withRouter(connect(mapStateToProps)(ViewGrid));

@@ -5,12 +5,6 @@ var bodyParser = require("body-parser");
 var app = express();
 var server = http.createServer(app).listen(3001);
 var io = socketio.listen(server);
-var jwt = require("jsonwebtoken")
-
-var bcrypt = require('bcryptjs');
-var saltRounds = 10;
-
-var secretKey = "signium";
 
 var mongoose = require("mongoose");
 mongoose.connect('mongodb://127.0.0.1:27017/project-signium');
@@ -27,237 +21,148 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', function() {
-  var schema = require("./schema");
-  var User = schema.user;
-  var Student = schema.student;
-  var Location = schema.location;
-  var House = schema.house;
+  var crud = require("./crud");
 
   var apiRoutes = express.Router();
-
   var studentRoutes = express.Router();
   var userRoutes = express.Router();
   var locationRoutes = express.Router();
+  var houseRoutes = express.Router();
+  var historyRoutes = express.Router();
 
-  userRoutes.post("/authenticate", function(req, res) {
-    var username = req.body.params.username.toLowerCase();
-    var password = req.body.params.password;
-    var userQuery = User.findOne({'username': username});
-    userQuery.select('password');
-    userQuery.exec(function(err, hash) {
-      if (err) {
-        res.json({success: false, reason: err.message});
-      }
-      bcrypt.compare(password, hash.password, function(err, result) {
-        if (err) {
-          res.json({success: false, reason: err.message});
-        }
-        if (result) {
-          userQuery.select('-password');
-          userQuery.exec(function(err1, user) {
-            if (err1) {
-              res.json({success: false, reason: err1.message});
-            }
-            res.json({
-              success: true,
-              authenticated: true,
-              token: jwt.sign({
-                data: user
-              }, secretKey)
-            });
-          });
-
-        } else {
-          res.json({success: true, authenticated: false});
-        }
-      });
+  userRoutes.post("/create", function(req, res) {
+    var user = {
+      username: req.body.params.username.toLowerCase(),
+      password: req.body.params.password,
+      role: req.body.params.role,
+      house: req.body.params.house,
+      firstname: req.body.params.firstname,
+      surname: req.body.params.surname
+    }
+    crud.createUser(user, function(response){
+      res.json(response);
     });
   });
   userRoutes.post("/read", function(req, res) {
     var jwt_key = req.body.params.jwt;
-    if (jwt_key != false) {
-      jwt.verify(jwt_key, secretKey, function(err, decoded) {
-        if (err) {
-          res.json({success: false, reason: err});
-        } else {
-          res.json({success: true, user: decoded});
-        }
-      });
-    } else {
-      res.json({succes: false})
-    }
+    crud.readUser(jwt_key, function(response){
+      res.json(response);
+    });
   });
-  userRoutes.post("/create", function(req, res) {
+  userRoutes.post("/update", function(req, res) {
+    crud.updateUser(req.body.params.id, req.body.params.user, function(response){
+      res.json(response);
+    });
+  });
+
+  userRoutes.get("/delete", function(req, res) {
+    crud.deleteUser(req.query.id, function(response){
+      res.json(response);
+    });
+  });
+  userRoutes.post("/authenticate", function(req, res) {
     var username = req.body.params.username.toLowerCase();
     var password = req.body.params.password;
-    var role = req.body.params.role;
-    var house = req.body.params.house;
-    var firstname = req.body.params.firstname;
-    var surname = req.body.params.surname;
-    bcrypt.hash(password, saltRounds, function(err, hash) {
-      if (err) {
-        res.json({success: false, reason: err.message});
-      }
-      password = hash;
-      var user = User.create({
-        username: username,
-        password: password,
-        role: role,
-        house: house
-      }, function(error, user) {
-        if (error) {
-          res.json({success: false, reason: error.message});
-        } else {
-          res.json({success: true});
-        }
-      });
+    crud.authenticateUser(username, password, function(response){
+      res.json(response);
     });
   });
 
-  userRoutes.post("/update", function(req, res) {
-    User.findByIdAndUpdate(id, req.body.params.user, function(err, user) {
-      if (err) {
-        res.json({success: false, reason: err.message});
-      } else {
-        res.json({success: true});
-      }
-    });
-  });
-
-  userRoutes.post("/delete", function(req, res) {
-    User.findByIdAndRemove(req.body.params.id, function(err, user) {
-      if (err) {
-        res.json({success: false, reason: err.message});
-      } else {
-        res.json({success: true});
-      }
-    });
-  });
 
   studentRoutes.post("/create", function(req, res) {
-    var newStudent = Student.create(req.body.params, function(err, student) {
-      if (err) {
-        res.json({success: false, reason: err.message});
-      } else {
-        res.json({success: true});
-      }
+    crud.createStudent(req.body.params.student, function(response){
+      res.json(response);
     });
   });
 
   studentRoutes.get("/read", function(req, res) {
     var minor = req.query.minor;
-    if (minor) {
-      Student.find({
-        "_house": req.query.house
-      }, 'location timelastout', function(err, students) {
-        if (err) {
-          res.json({success: false, reason: err.message});
-        } else {
-          res.json({success: true, students: students});
-        }
-      });
-    } else {
-      Student.find({
-        "_house": req.query.house
-      }, function(err, students) {
-        if (err) {
-          res.json({success: false, reason: err.message});
-        } else {
-          res.json({success: true, students: students});
-        }
-      });
-    }
+    var house = req.query.house;
+    crud.readStudents(minor, house, function(response){
+      res.json(response);
+    });
   });
 
   studentRoutes.post("/update", function(req, res) {
-    Student.findByIdAndUpdate(req.body.params.id, req.body.params.student, function(err, student) {
-      if (err) {
-        res.json({success: false, reason: err.message});
-      } else {
-        res.json({success: true, student: student});
-      }
+    crud.updateStudent(req.body.params.id, req.body.params.student, function(response){
+      res.json(response);
     });
   });
 
   studentRoutes.get("/update-location", function(req, res) {
-    success = true;
-    results = [];
-    var queryLocation = JSON.parse(req.query.location);
-    var newLocation = {
-      id: queryLocation._id,
-      name: queryLocation.name,
-      colour: queryLocation.colour
-    };
-    if (req.query.ids) {
-      JSON.parse(req.query.ids).forEach(function(id) {
-        Student.findByIdAndUpdate(id, {
-          location: newLocation,
-          timelastout: new Date()
-        }, function(err, student) {
-          if (err) {
-            success = false;
-            res.json({success: false, reason: err.message});
-          }
-          results.push(student);
-        });
-      });
-    }
-    if (success) {
-      res.json({success: true, students: results});
-    }
+    crud.updateStudentLocation(req.query.ids, JSON.parse(req.query.location), function(response){
+      res.json(response);
+    }, crud.createHistory);
   });
 
   studentRoutes.get("/delete", function(req, res) {
-    Student.findByIdAndRemove(req.query.id, function(err, user) {
-      if (err) {
-        res.json({success: false, reason: err.message});
-      } else {
-        res.json({success: true});
+    crud.deleteStudent(req.query.id, function(response){
+      res.json(response);
+    });
+  });
+  studentRoutes.post("/upload", function(req, res) {
+    var sent = false;
+    crud.uploadStudents(req.body.params.json, req.body.params.house, function(response){
+      if(!sent){
+        res.json(response);
+        sent = true;
       }
     });
   });
 
   locationRoutes.post("/create", function(req, res) {
-    var newLocation = Location.create(req.body.params, function(err) {
-      if (err) {
-        res.json({success: false, reason: err.message});
-      } else {
-        res.json({success: true});
-      }
+    crud.createLocation(req.body.params.location, function(response){
+      res.json(response);
     });
   });
   locationRoutes.get("/read", function(req, res) {
-    Location.find({
-      "_house": req.query.house
-    }, function(err, locations) {
-      if (err) {
-        res.json({success: false, reason: err.message});
-      } else {
-        res.json({success: true, locations: locations});
-      }
+    crud.readLocations(req.query.house, function(response){
+      res.json(response);
     });
   });
   locationRoutes.post("/update", function(req, res) {
-    Location.findByIdAndUpdate(req.body.params.id, req.body.params.location, function(err, location) {
-      if (err) {
-        res.json({success: false, reason: err.message});
-      }
-      res.json({success: true, location: location});
+    crud.updateLocation(req.body.params.id, req.body.params.location, function(response){
+      res.json(response);
     });
   });
   locationRoutes.get("/delete", function(req, res) {
-    Location.findByIdAndRemove(req.query.id, function(err) {
-      if (err) {
-        res.json({success: false, reason: err.message});
-      } else {
-        res.json({success: true});
-      }
+    crud.deleteLocation(req.query.id, function(response){
+      res.json(response);
+    });
+  });
+
+  houseRoutes.post("/create", function(req, res) {
+    crud.createHouse(house, function(response){
+      res.json(response);
+    });
+  });
+  houseRoutes.get("/read", function(req, res) {
+    crud.readHouses(function(response){
+      res.json(response);
+    });
+  });
+  houseRoutes.post("/update", function(req, res) {
+    crud.updateHouse(req.body.params.id, req.body.params.house, function(response){
+      res.json(response);
+    });
+  });
+  houseRoutes.get("/delete", function(req, res) {
+    crud.deleteHouse(req.query.id, function(response){
+      res.json(response);
+    });
+  });
+
+  historyRoutes.get("/read", function(req, res){
+    crud.readHistory(req.query.filter, req.query.amount, req.query.house, function(response){
+      res.json(response);
     });
   });
 
   apiRoutes.use('/students', studentRoutes);
   apiRoutes.use('/users', userRoutes);
   apiRoutes.use('/locations', locationRoutes);
+  apiRoutes.use('/houses', houseRoutes);
+  apiRoutes.use('/history', historyRoutes);
 
   app.use('/api', apiRoutes);
 });
@@ -276,20 +181,20 @@ io.on("connect", function(socket) {
   });
   socket.on("socket-client-server-redraw-major", function() {
     sockets.forEach(function(clientSocket) {
-      if(clientSocket.house === socketHouse){
+      if (clientSocket.house === socketHouse) {
         clientSocket.socket.emit("socket-server-client-redraw-major", {house: socketHouse});
       }
     });
   });
   socket.on("socket-client-server-redraw-minor", function() {
     sockets.forEach(function(clientSocket) {
-      if(clientSocket.house === socketHouse){
+      if (clientSocket.house === socketHouse) {
         clientSocket.socket.emit("socket-server-client-redraw-minor", {house: socketHouse});
       }
     });
   });
   socket.on("disconnect", function() {
     var indexOf = sockets.indexOf({socket: socket, admin: socketAdmin, role: socketRole, house: socketHouse});
-    sockets.splice(indexOf, 0);
+    sockets.splice(indexOf);
   });
 });

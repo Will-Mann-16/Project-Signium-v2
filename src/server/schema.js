@@ -11,7 +11,13 @@ var studentSchema = mongoose.Schema({
     },
     _house: String,
     timelastout: Date,
-    code: String
+    code: {
+        type: String,
+        unique: true,
+        lowercase: true,
+        trim: true
+    },
+    password: String
 });
 
 var locationSchema = mongoose.Schema({
@@ -42,14 +48,33 @@ var houseSchema = mongoose.Schema({
     colours: [String],
     personell: [String]
 });
-var Student = mongoose.model("Students", studentSchema);
-var Location = mongoose.model("Locations", locationSchema);
-var User = mongoose.model("Users", userSchema);
-var House = mongoose.model("Houses", houseSchema);
+
+var historySchema = mongoose.Schema({
+    student: {
+      _id: String,
+      firstname: String,
+      surname: String,
+      yeargroup: String
+    },
+    location: {
+      _id: String,
+      name: String
+    },
+    _house: String,
+    time: Date
+});
+//historySchema.index({"student.firstname": "text", "student.surname": "text", "student.yeargroup": "text", "location.name": "text"});
+
+var Student = mongoose.model("Student", studentSchema);
+var Location = mongoose.model("Location", locationSchema);
+var User = mongoose.model("User", userSchema);
+var House = mongoose.model("Houselist", houseSchema, 'houselist');
+var History = mongoose.model("History", historySchema, 'history');
 
 module.exports = {
     student: Student,
     location: Location,
     user: User,
-    house: House
+    house: House,
+    history: History
 };

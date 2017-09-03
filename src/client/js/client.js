@@ -4,8 +4,8 @@ import { Provider } from "react-redux";
 
 import App from "./components/App";
 import store from "./store";
-import history from "./history";
+import nHistory from './history';
 ReactDOM.render(<Provider store={store}>
-    <App history={history}/>
+    <App history={nHistory}/>
   </Provider>
 , document.getElementById('app'));

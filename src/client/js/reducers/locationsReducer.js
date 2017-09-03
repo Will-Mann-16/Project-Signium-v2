@@ -5,48 +5,35 @@ export default function reducer(state={
   error: null
 }, action){
   switch(action.type){
-    case "FETCH_LOCATIONS":{
+    case "CREATE_LOCATION":
       return {...state, fetching: true, fetched: false};
-    }
-    case "FETCH_LOCATIONS_REJECTED":{
+    case "CREATE_LOCATION_REJECTED":
       return {...state, fetching: false, error: action.payload};
-    }
-    case "FETCH_LOCATIONS_FULFILLED": {
+    case "CREATE_LOCATION_FULFILLED":
+      return {...state, fetching: false, fetched: true};
+
+    case "READ_LOCATIONS":
+      return {...state, fetching: true, fetched: false};
+    case "READ_LOCATIONS_REJECTED":
+      return {...state, fetching: false, error: action.payload};
+    case "READ_LOCATIONS_FULFILLED":
       return {...state, fetching: false, fetched: true, locations: action.payload};
-    }
 
-    case "ADD_LOCATION":{
+    case "UPDATE_LOCATION":
       return {...state, fetching: true, fetched: false};
-    }
-    case "ADD_LOCATION_REJECTED":{
+    case "UPDATE_LOCATION_REJECTED":
       return {...state, fetching: false, error: action.payload};
-    }
-    case "ADD_LOCATION_FULFILLED": {
+    case "UPDATE_LOCATION_FULFILLED":
       return {...state, fetching: false, fetched: true};
-    }
 
-    case "UPDATE_LOCATION":{
+    case "DELETE_LOCATION":
       return {...state, fetching: true, fetched: false};
-    }
-    case "UPDATE_LOCATION_REJECTED":{
+    case "DELETE_LOCATION_REJECTED":
       return {...state, fetching: false, error: action.payload};
-    }
-    case "UPDATE_LOCATION_FULFILLED": {
+    case "DELETE_LOCATION_FULFILLED":
       return {...state, fetching: false, fetched: true};
-    }
 
-    case "DELETE_LOCATION":{
-      return {...state, fetching: true, fetched: false};
-    }
-    case "DELETE_LOCATION_REJECTED":{
-      return {...state, fetching: false, error: action.payload};
-    }
-    case "DELETE_LOCATION_FULFILLED": {
-      return {...state, fetching: false, fetched: true};
-    }
-
-    default:{
+    default:
       return state;
-    }
   }
 }

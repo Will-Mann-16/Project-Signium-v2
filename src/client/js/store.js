@@ -10,4 +10,4 @@ import history from "./history";
 
 const middleware = applyMiddleware(thunk, routerMiddleware(history));
 
-export default createStore(reducer, middleware);
+export default createStore(reducer, {}, middleware);

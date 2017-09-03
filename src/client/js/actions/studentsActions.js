@@ -1,33 +1,6 @@
 /*jshint esversion: 6 */
 import axios from "axios";
-import { emit, house, scriptsDirectory } from "./../socket.js";
-
-export function fetchStudentsMajor(){
-  return dispatch => {
-    dispatch({type: "FETCH_STUDENTS_MAJOR"});
-    axios.get(scriptsDirectory + "students/read", {params: { house: house }}).then((response) =>{
-      dispatch({type: "FETCH_STUDENTS_MAJOR_FULFILLED", payload: response.data.students});
-    }).catch((err) =>{
-      dispatch({type: "FETCH_STUDENTS_MAJOR_REJECTED", payload: err});
-    });
-  };
-}
-
-export function fetchStudentsMinor(){
-  return dispatch => {
-    dispatch({type: "FETCH_STUDENTS_MINOR"});
-    axios.get(scriptsDirectory + "students/read", {params: {house: house, minor: true}}).then((response) =>{
-      if(response.data.success){
-        emit("socket-client-server-redraw-major");
-        dispatch({type: "ADD_STUDENT_FULFILLED", payload: response.data.students});
-      }
-      else{
-        dispatch({type: "ADD_STUDENT_REJECTED", payload: response.data.reason});
-      }    }).catch((err) =>{
-      dispatch({type: "FETCH_STUDENTS_MINOR_REJECTED", payload: err});
-    });
-  };
-}
+import { emit, scriptsDirectory} from "./../socket.js";
 
 export function selectStudent(id){
   return dispatch => {
@@ -39,28 +12,55 @@ export function deselectStudent(id){
     dispatch({type: "DESELECT_STUDENT", payload: id});
   }
 }
-
-export function addStudent(student){
+export function createStudent(student){
   return dispatch => {
-    dispatch({type: "ADD_STUDENT"});
-    axios.get(scriptsDirectory + "students/add", {params: { student: student }}).then((response) =>{
+    dispatch({type: "CREATE_STUDENT"});
+    axios.post(scriptsDirectory + "students/create", {params: { student: student }}).then((response) =>{
       if(response.data.success){
         emit("socket-client-server-redraw-major");
-        dispatch({type: "ADD_STUDENT_FULFILLED", payload: true});
+        dispatch({type: "CREATE_STUDENT_FULFILLED", payload: true});
       }
       else{
-        dispatch({type: "ADD_STUDENT_REJECTED", payload: response.data.reason});
+        dispatch({type: "CREATE_STUDENT_REJECTED", payload: response.data.reason});
       }
     }).catch((err) =>{
-      dispatch({type: "ADD_STUDENT_REJECTED", payload: err});
+      dispatch({type: "CREATE_STUDENT_REJECTED", payload: err});
+    });
+  };
+}
+export function readStudentsMajor(house){
+  return dispatch => {
+    dispatch({type: "READ_STUDENTS_MAJOR"});
+    axios.get(scriptsDirectory + "students/read", {params: { house: house }}).then((response) =>{
+      dispatch({type: "READ_STUDENTS_MAJOR_FULFILLED", payload: response.data.students});
+    }).catch((err) =>{
+      dispatch({type: "READ_STUDENTS_MAJOR_REJECTED", payload: err});
     });
   };
 }
 
+export function readStudentsMinor(house){
+  return dispatch => {
+    dispatch({type: "READ_STUDENTS_MINOR"});
+    axios.get(scriptsDirectory + "students/read", {params: {house: house, minor: true}}).then((response) =>{
+      if(response.data.success){
+        emit("socket-client-server-redraw-major");
+        dispatch({type: "READ_STUDENT_MINOR_FULFILLED", payload: response.data.students});
+      }
+      else{
+        dispatch({type: "READ_STUDENT_REJECTED", payload: response.data.reason});
+      }    }).catch((err) =>{
+      dispatch({type: "READ_STUDENTS_MINOR_REJECTED", payload: err});
+    });
+  };
+}
+
+
+
 export function updateStudentLocation(ids, location){
   return dispatch => {
     dispatch({type: "UPDATE_STUDENT_LOCATION"});
-    axios.get(scriptsDirectory + "students/update-location",  {params: { ids: JSON.stringify(ids), location: location, house: house }}).then((response) =>{
+    axios.get(scriptsDirectory + "students/update-location",  {params: { ids: ids, location: location }}).then((response) =>{
       if(response.data.success){
         emit("socket-client-server-redraw-minor");
         dispatch({type: "UPDATE_STUDENT_LOCATION_FULFILLED", payload: response.data.students});
@@ -77,7 +77,7 @@ export function updateStudentLocation(ids, location){
 export function updateStudent(id, student){
   return dispatch => {
     dispatch({type: "UPDATE_STUDENT"});
-    axios.get(scriptsDirectory + "students/update",  {params: { id: id, student: student, house: house }}).then((response) =>{
+    axios.post(scriptsDirectory + "students/update",  {params: { id: id, student: student }}).then((response) =>{
       if(response.data.success){
         emit("socket-client-server-redraw-major");
         dispatch({type: "UPDATE_STUDENT_FULFILLED", payload: response.data.student});
@@ -94,7 +94,7 @@ export function updateStudent(id, student){
 export function deleteStudent(id){
   return dispatch => {
     dispatch({type: "DELETE_STUDENT"});
-    axios.get(scriptsDirectory + "student/delete",  {params: { id: id, house: house }}).then((response) =>{
+    axios.get(scriptsDirectory + "students/delete",  {params: { id: id}}).then((response) =>{
       if(response.data.success){
         emit("socket-client-server-redraw-minor");
         dispatch({type: "DELETE_STUDENT_FULFILLED", payload: response.data.success});
@@ -106,4 +106,21 @@ export function deleteStudent(id){
       dispatch({type: "DELETE_STUDENT_REJECTED", payload: err});
     });
   };
+}
+
+export function uploadStudents(json,house){
+  return dispatch => {
+    dispatch({type: "UPLOAD_STUDENTS"});
+    axios.post(scriptsDirectory + "students/upload", {params: { json: json , house: house}}).then((response) =>{
+      if(response.data.success){
+        emit("socket-client-server-redraw-major");
+        dispatch({type: "UPLOAD_STUDENTS_FULFILLED", payload: response.data.success});
+      }
+      else{
+        dispatch({type: "UPLOAD_STUDENTS_REJECTED", payload: response.data.reason});
+      }
+    }).catch((err) =>{
+      dispatch({type: "UPLOAD_STUDENTS_REJECTED", payload: err});
+    });
+  }
 }

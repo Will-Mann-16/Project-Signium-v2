@@ -5,18 +5,19 @@
   text-align: center;
   text-decoration: none;
   display: inline-block;
+  cursor: pointer;
 }
 
-%btn-xs{
+.btn-xs{
   font-size: 10px;
 }
-%btn-s{
+.btn-s{
   font-size: 12px;
 }
-%btn-l{
+.btn-l{
   font-size: 20px;
 }
-%btn-xl{
+.btn-xl{
   font-size: 24px;
 }
 
@@ -28,18 +29,33 @@
       &:hover{
         background-color: darken($colour, 10%);
       }
-      &-xs{
-        @extend %btn-xs;
-      }
-      &-s{
-        @extend %btn-s;
-      }
-      &-l{
-        @extend %btn-l;
-      }
-      &-xl{
-        @extend %btn-xl;
-      }
     }
   }
+}
+
+.btn-group > *{
+  float:left;
+  margin: 0;
+}
+.btn-group > *::after{
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.btn-icon{
+  padding: 20px;
+  font-size: 30px;
+  width: 50px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.btn-icon-small{
+  padding: 5px;
+  font-size: 20px;
+  text-align: center;
+  text-decoration: none;
+  top: 0;
+  bottom: 0;
 }

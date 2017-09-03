@@ -17,3 +17,19 @@
     }
   }
 }
+
+.icon-bar{
+  background-color: lighten(black, 20%);
+  color: white;
+  width: 100%;
+  display: flex;
+  a{
+    flex: 1 auto;
+    text-align: center;
+    padding: 15px;
+    background-color: inherit;
+    &:hover{
+        background-color: lighten(black, 30%);
+    }
+  }
+}
